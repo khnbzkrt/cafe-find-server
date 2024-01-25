@@ -1,0 +1,137 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum FileTypeEnum {
+  DOCUMENT
+  VIDEO
+  IMAGE
+}
+
+enum DayOfWeekEnum {
+  ONE
+  TWO
+  THREE
+  FOUR
+  FIVE
+  SIX
+  SEVEN
+}
+
+enum ClimateRatingEnum {
+  ZERO
+  ONE
+  TWO
+  THREE
+  FOUR
+  FIVE
+}
+
+model File {
+  id        Int          @id @default(autoincrement())
+  fileType  FileTypeEnum
+  path      String
+  createdAt DateTime     @default(now())
+  updatedAt DateTime?    @updatedAt
+
+  Brand Brand[]
+  Store Store[]
+}
+
+model Brand {
+  id        Int       @id @default(autoincrement())
+  name      String    @unique
+  file      File?     @relation(fields: [fileId], references: [id])
+  fileId    Int?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
+  Store     Store[]
+}
+
+model Province {
+  id        Int       @id @default(autoincrement())
+  name      String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
+
+  District District[]
+  Store    Store[]
+}
+
+model District {
+  id        Int       @id @default(autoincrement())
+  name      String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
+
+  province   Province @relation(fields: [provinceId], references: [id])
+  provinceId Int
+  Store      Store[]
+}
+
+model WorkingHour {
+  id        Int           @id @default(autoincrement())
+  startTime DateTime      @db.Time()
+  endTime   DateTime      @db.Time()
+  dayOfWeek DayOfWeekEnum
+  createdAt DateTime      @default(now())
+  updatedAt DateTime?     @updatedAt
+  Feature   Feature[]
+}
+
+model Store {
+  id          Int       @id @default(autoincrement())
+  name        String
+  description String    @db.LongText
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime? @updatedAt
+
+  feature   Feature @relation(fields: [featureId], references: [id])
+  featureId Int
+
+  brand   Brand @relation(fields: [brandId], references: [id])
+  brandId Int
+
+  province   Province @relation(fields: [provinceId], references: [id])
+  provinceId Int
+
+  district   District @relation(fields: [districtId], references: [id])
+  districtId Int
+
+  file   File @relation(fields: [fileId], references: [id])
+  fileId Int
+}
+
+model Feature {
+  id                   Int               @id @default(autoincrement())
+  hasWifi              Boolean           @default(false)
+  wifiSpeed            String
+  hasWc                Boolean           @default(false)
+  hasParking           Boolean           @default(false)
+  isSelfService        Boolean           @default(false)
+  hasStudyArea         Boolean           @default(false)
+  studyAreaCapacity    Int               @default(0)
+  hasOpenArea          Boolean           @default(false)
+  closeAreaCapacity    Int               @default(0)
+  openAreaCapacity     Int               @default(0)
+  hasCloseSmokeArea    Boolean           @default(false)
+  hasCloseAreaElectric Boolean           @default(false)
+  hasOpenAreaElectric  Boolean           @default(false)
+  winterClimateRating  ClimateRatingEnum @default(ZERO)
+  sunClimateRating     ClimateRatingEnum @default(ZERO)
+  createdAt            DateTime          @default(now())
+  updatedAt            DateTime?         @updatedAt
+
+  workingHour   WorkingHour @relation(fields: [workingHourId], references: [id])
+  workingHourId Int
+
+  Store Store[]
+}
