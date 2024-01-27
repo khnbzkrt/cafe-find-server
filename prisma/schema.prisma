@@ -72,9 +72,10 @@ model District {
   createdAt DateTime  @default(now())
   updatedAt DateTime? @updatedAt
 
-  province   Province @relation(fields: [provinceId], references: [id])
-  provinceId Int
-  Store      Store[]
+  province   Province? @relation(fields: [provinceId], references: [id])
+  provinceId Int?
+
+  Store Store[]
 }
 
 model WorkingHour {

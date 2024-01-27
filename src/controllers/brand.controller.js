@@ -21,7 +21,7 @@ const BrandController = {
         });
     }),
     createBrand: asyncHandler(async (req, res) => {
-        const brand = await BrandService.createBrand(req.body);
+        const brand = await BrandService.createBrand(req);
 
         res.status(201).json({
             status: true,
